@@ -1,7 +1,14 @@
 # AI-Powered Support Ticket Intelligence & Anomaly Detection System
 
+> **DOTMappers IT Pvt. Ltd. — AI Engineer Assessment (End-to-End AI System Sprint)**  
+> **Author**: Shaik Nayab Rasool  
+> **Live Web Dashboard**: [https://support-ticket-ai-system.onrender.com/](https://support-ticket-ai-system.onrender.com/)  
+> **Live Swagger API Docs**: [https://support-ticket-ai-system.onrender.com/docs](https://support-ticket-ai-system.onrender.com/docs)  
+> **Submission Email**: `RajathKumar@dotmappers.in`  
+> **Subject Line**: `[AI Engineer Assessment] — Shaik Nayab Rasool`  
+> **Zero-Cost Guarantee**: Fully runnable online or locally at **$0.00 cost** without requiring mandatory paid APIs.
 
-## 1. Executive Summary
+---
 
 This repository delivers a production-grade, end-to-end AI system that ingests customer support ticket data, enables natural language conversational querying via Text-to-SQL synthesis, flags operational anomalies using statistical and rule-based algorithms, and exposes all functionality through both a **FastAPI REST API** and a **responsive Web UI Dashboard**.
 

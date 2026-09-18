@@ -1,12 +1,6 @@
 # AI-Powered Support Ticket Intelligence & Anomaly Detection System
 
-> **DOTMappers IT Pvt. Ltd. — AI Engineer Assessment (End-to-End AI System Sprint)**  
-> **Author**: Shaik Nayab Rasool  
-> **Submission Email**: `RajathKumar@dotmappers.in`  
-> **Subject Line**: `[AI Engineer Assessment] — Shaik Nayab Rasool`  
-> **Zero-Cost Guarantee**: Fully runnable offline at **$0.00 cost** without requiring mandatory paid APIs.
 
----
 
 ## 1. Executive Summary
 

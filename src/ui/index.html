@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Support Ticket Intelligence & Anomaly Detection System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0f1d;
+            --bg-secondary: #111827;
+            --bg-glass: rgba(17, 24, 39, 0.75);
+            --border-glass: rgba(255, 255, 255, 0.08);
+            --accent-blue: #3b82f6;
+            --accent-purple: #8b5cf6;
+            --accent-cyan: #06b6d4;
+            --accent-emerald: #10b981;
+            --accent-rose: #f43f5e;
+            --accent-amber: #f59e0b;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --text-dim: #6b7280;
+            --card-radius: 16px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-main);
+            min-height: 100vh;
+            background-image: 
+                radial-gradient(circle at 15% 15%, rgba(59, 130, 246, 0.12) 0%, transparent 40%),
+                radial-gradient(circle at 85% 85%, rgba(139, 92, 246, 0.12) 0%, transparent 40%);
+            background-attachment: fixed;
+            padding-bottom: 60px;
+        }
+
+        header {
+            border-bottom: 1px solid var(--border-glass);
+            background: rgba(10, 15, 29, 0.85);
+            backdrop-filter: blur(16px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-container {
+            max-width: 1380px;
+            margin: 0 auto;
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .brand-logo {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 20px;
+            color: white;
+            box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4);
+        }
+
+        .brand-text h1 {
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            background: linear-gradient(to right, #ffffff, #93c5fd);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .brand-text p {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .header-status {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            background: rgba(16, 185, 129, 0.12);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.25);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #10b981;
+            box-shadow: 0 0 10px #10b981;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
+
+        .container {
+            max-width: 1380px;
+            margin: 32px auto;
+            padding: 0 24px;
+        }
+
+        /* KPI Metrics Grid */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .metric-card {
+            background: var(--bg-glass);
+            border: 1px solid var(--border-glass);
+            border-radius: var(--card-radius);
+            padding: 20px;
+            backdrop-filter: blur(12px);
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .metric-title {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            font-weight: 600;
+        }
+
+        .metric-value {
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            color: #ffffff;
+        }
+
+        .metric-subtitle {
+            font-size: 12px;
+            color: var(--text-dim);
+            margin-top: 4px;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 12px;
+            border-bottom: 1px solid var(--border-glass);
+            margin-bottom: 24px;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 15px;
+            font-weight: 600;
+            padding: 12px 20px;
+            cursor: pointer;
+            position: relative;
+            transition: color 0.2s;
+        }
+
+        .tab-btn:hover {
+            color: var(--text-main);
+        }
+
+        .tab-btn.active {
+            color: #60a5fa;
+        }
+
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple));
+        }
+
+        /* Tab Content */
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Query Section */
+        .query-box {
+            background: var(--bg-glass);
+            border: 1px solid var(--border-glass);
+            border-radius: var(--card-radius);
+            padding: 24px;
+            backdrop-filter: blur(12px);
+            margin-bottom: 24px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .query-input {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.35);
+            border: 1px solid var(--border-glass);
+            border-radius: 12px;
+            padding: 14px 20px;
+            font-size: 15px;
+            color: #ffffff;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .query-input:focus {
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 14px 28px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s, transform 0.1s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary:hover {
+            opacity: 0.95;
+            transform: scale(0.99);
+        }
+
+        /* Sample Prompt Chips */
+        .chips-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .chips-label {
+            font-size: 12px;
+            color: var(--text-dim);
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-right: 4px;
+        }
+
+        .chip {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-glass);
+            border-radius: 20px;
+            padding: 6px 14px;
+            font-size: 13px;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .chip:hover {
+            background: rgba(59, 130, 246, 0.15);
+            color: #93c5fd;
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+
+        /* Result Card */
+        .result-card {
+            background: var(--bg-glass);
+            border: 1px solid var(--border-glass);
+            border-radius: var(--card-radius);
+            padding: 24px;
+            backdrop-filter: blur(12px);
+            margin-top: 24px;
+            display: none;
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-glass);
+        }
+
+        .answer-box {
+            font-size: 17px;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 16px;
+            padding: 16px;
+            border-radius: 12px;
+            background: rgba(59, 130, 246, 0.08);
+            border-left: 4px solid var(--accent-blue);
+        }
+
+        .sql-box {
+            background: #0d1117;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 14px 18px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            color: #7ee787;
+            overflow-x: auto;
+            margin-bottom: 20px;
+        }
+
+        /* Data Table */
+        .table-responsive {
+            overflow-x: auto;
+            margin-top: 16px;
+            border-radius: 10px;
+            border: 1px solid var(--border-glass);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 13px;
+        }
+
+        th {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 12px 16px;
+            font-weight: 600;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border-glass);
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 0.04em;
+        }
+
+        td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-glass);
+            color: var(--text-main);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .badge-critical {
+            background: rgba(244, 63, 94, 0.18);
+            color: #fb7185;
+            border: 1px solid rgba(244, 63, 94, 0.35);
+        }
+
+        .badge-high {
+            background: rgba(245, 158, 11, 0.18);
+            color: #fbbf24;
+            border: 1px solid rgba(245, 158, 11, 0.35);
+        }
+
+        .badge-medium {
+            background: rgba(59, 130, 246, 0.18);
+            color: #93c5fd;
+            border: 1px solid rgba(59, 130, 246, 0.35);
+        }
+
+        .badge-low {
+            background: rgba(16, 185, 129, 0.18);
+            color: #6ee7b7;
+            border: 1px solid rgba(16, 185, 129, 0.35);
+        }
+
+        .badge-open {
+            background: rgba(245, 158, 11, 0.15);
+            color: #fcd34d;
+        }
+        .badge-resolved {
+            background: rgba(16, 185, 129, 0.15);
+            color: #6ee7b7;
+        }
+        .badge-escalated {
+            background: rgba(244, 63, 94, 0.15);
+            color: #fda4af;
+        }
+
+        /* Anomaly Grid */
+        .anomaly-header-filter {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .filter-select {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--border-glass);
+            border-radius: 8px;
+            padding: 8px 16px;
+            color: var(--text-main);
+            outline: none;
+            font-size: 13px;
+        }
+
+        .anomaly-card {
+            background: var(--bg-glass);
+            border: 1px solid var(--border-glass);
+            border-radius: 12px;
+            padding: 18px 22px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            backdrop-filter: blur(8px);
+        }
+
+        .anomaly-card.critical {
+            border-left: 4px solid var(--accent-rose);
+        }
+
+        .anomaly-card.high {
+            border-left: 4px solid var(--accent-amber);
+        }
+
+        .anomaly-info h4 {
+            font-size: 15px;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 4px;
+        }
+
+        .anomaly-info p {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .anomaly-stats {
+            text-align: right;
+            min-width: 140px;
+        }
+
+        .anomaly-stat-val {
+            font-size: 20px;
+            font-weight: 800;
+            color: #ffffff;
+        }
+
+        .anomaly-stat-sub {
+            font-size: 11px;
+            color: var(--text-dim);
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-container">
+            <div class="brand">
+                <div class="brand-logo">AI</div>
+                <div class="brand-text">
+                    <h1>Support Ticket Intelligence</h1>
+                    <p>Natural Language Text-to-SQL & Statistical Anomaly Detection</p>
+                </div>
+            </div>
+            <div class="header-status">
+                <span class="status-badge">
+                    <span class="status-dot"></span>
+                    <span id="systemStatus">Ready & Connected</span>
+                </span>
+                <a href="/docs" target="_blank" style="color: #60a5fa; text-decoration: none; font-size: 13px; font-weight: 600;">Swagger Docs &rarr;</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+
+        <!-- KPI Metrics -->
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-title">Total Ingested</div>
+                <div class="metric-value" id="totalTickets">500</div>
+                <div class="metric-subtitle">Support Tickets Ingested</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-title">Open Tickets</div>
+                <div class="metric-value" id="openTickets" style="color: #fbbf24;">111</div>
+                <div class="metric-subtitle">Pending Resolution</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-title">Resolved Tickets</div>
+                <div class="metric-value" id="resolvedTickets" style="color: #34d399;">327</div>
+                <div class="metric-subtitle">65.4% Resolution Rate</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-title">Average CSAT</div>
+                <div class="metric-value" id="avgCsat">3.75 <span style="font-size: 16px; color: var(--text-dim);">/ 5.0</span></div>
+                <div class="metric-subtitle">Customer Satisfaction</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-title">Avg Resolution</div>
+                <div class="metric-value" id="avgResolution">19.2 <span style="font-size: 16px; color: var(--text-dim);">hrs</span></div>
+                <div class="metric-subtitle">Mean Duration</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-title">Active Anomalies</div>
+                <div class="metric-value" id="anomaliesCount" style="color: #fb7185;">102</div>
+                <div class="metric-subtitle">Outliers & SLA Breaches</div>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('nlq')">💬 Natural Language Query</button>
+            <button class="tab-btn" onclick="switchTab('anomalies')">⚠️ Anomaly Detection (102)</button>
+            <button class="tab-btn" onclick="switchTab('tickets')">📋 Ticket Database</button>
+        </div>
+
+        <!-- TAB 1: Natural Language Query -->
+        <div id="tab-nlq" class="tab-content active">
+            <div class="query-box">
+                <div class="input-group">
+                    <input type="text" id="queryInput" class="query-input" placeholder="Ask anything in natural language... e.g. 'How many tickets are currently open?'">
+                    <button class="btn-primary" id="askBtn" onclick="runQuery()">
+                        <span id="btnText">Ask AI</span>
+                    </button>
+                </div>
+
+                <div class="chips-container">
+                    <span class="chips-label">Sample Prompts:</span>
+                    <button class="chip" onclick="setQuery('How many tickets are currently open?')">How many tickets are currently open?</button>
+                    <button class="chip" onclick="setQuery('Which agent resolved the most tickets this month?')">Which agent resolved the most tickets this month?</button>
+                    <button class="chip" onclick="setQuery('Show me all Critical tickets not resolved within 12 hours.')">Critical tickets not resolved within 12h</button>
+                    <button class="chip" onclick="setQuery('What is the average customer rating for Technical category tickets?')">Avg rating for Technical tickets</button>
+                    <button class="chip" onclick="setQuery('Are there any anomalies in resolution times this week?')">Anomalies in resolution times this week?</button>
+                    <button class="chip" onclick="setQuery('Which agent has the lowest average customer rating?')">Agent with lowest customer rating?</button>
+                    <button class="chip" onclick="setQuery('How many critical tickets are unresolved?')">How many critical tickets are unresolved?</button>
+                </div>
+            </div>
+
+            <!-- Query Result Container -->
+            <div id="resultCard" class="result-card">
+                <div class="result-header">
+                    <div>
+                        <span style="font-size: 13px; color: var(--text-dim);">Execution Time: </span>
+                        <span id="execTime" style="font-weight: 700; color: #60a5fa;">0 ms</span>
+                    </div>
+                    <div>
+                        <span style="font-size: 13px; color: var(--text-dim);">Engine: </span>
+                        <span id="providerBadge" class="badge badge-medium">NLP Engine</span>
+                    </div>
+                </div>
+
+                <div class="answer-box" id="answerText"></div>
+
+                <div style="font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px;">GENERATED SQL QUERY:</div>
+                <div class="sql-box" id="sqlCode"></div>
+
+                <div id="tableContainer"></div>
+            </div>
+        </div>
+
+        <!-- TAB 2: Anomaly Detection -->
+        <div id="tab-anomalies" class="tab-content">
+            <div class="anomaly-header-filter">
+                <div>
+                    <h3 style="font-size: 18px; margin-bottom: 4px;">Detected Anomalies & Outliers</h3>
+                    <p style="font-size: 13px; color: var(--text-muted);">Statistical IQR Outliers and SLA Breaches (> 24 hours)</p>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <select id="anomalyCategoryFilter" class="filter-select" onchange="loadAnomalies()">
+                        <option value="">All Categories</option>
+                        <option value="Billing">Billing</option>
+                        <option value="Technical">Technical</option>
+                        <option value="General">General</option>
+                    </select>
+                    <select id="anomalySeverityFilter" class="filter-select" onchange="loadAnomalies()">
+                        <option value="">All Severities</option>
+                        <option value="CRITICAL">Critical Only</option>
+                        <option value="HIGH">High & Critical</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="anomaliesList"></div>
+        </div>
+
+        <!-- TAB 3: Tickets Database -->
+        <div id="tab-tickets" class="tab-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <h3 style="font-size: 18px;">All Support Tickets (500 Records)</h3>
+                <div style="display: flex; gap: 10px;">
+                    <select id="ticketStatusFilter" class="filter-select" onchange="loadTickets(1)">
+                        <option value="">All Statuses</option>
+                        <option value="Open">Open</option>
+                        <option value="Resolved">Resolved</option>
+                        <option value="Escalated">Escalated</option>
+                    </select>
+                    <select id="ticketPriorityFilter" class="filter-select" onchange="loadTickets(1)">
+                        <option value="">All Priorities</option>
+                        <option value="Critical">Critical</option>
+                        <option value="High">High</option>
+                        <option value="Medium">Medium</option>
+                        <option value="Low">Low</option>
+                    </select>
+                </div>
+            </div>
+            <div id="ticketsTableContainer"></div>
+            <div id="paginationContainer" style="display: flex; justify-content: space-between; align-items: center; margin-top: 16px;"></div>
+        </div>
+
+    </div>
+
+    <script>
+        // Tab switching
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById('tab-' + tabId).classList.add('active');
+
+            if (tabId === 'anomalies') loadAnomalies();
+            if (tabId === 'tickets') loadTickets(1);
+        }
+
+        function setQuery(text) {
+            document.getElementById('queryInput').value = text;
+            runQuery();
+        }
+
+        // Run NL Query
+        async function runQuery() {
+            const input = document.getElementById('queryInput');
+            const q = input.value.trim();
+            if (!q) return;
+
+            const btnText = document.getElementById('btnText');
+            btnText.innerHTML = '<span class="spinner"></span> Analyzing...';
+
+            try {
+                const response = await fetch('/query', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({query: q})
+                });
+                const data = await response.json();
+
+                document.getElementById('resultCard').style.display = 'block';
+                document.getElementById('answerText').innerText = data.answer;
+                document.getElementById('sqlCode').innerText = data.sql;
+                document.getElementById('execTime').innerText = data.execution_time_ms + ' ms';
+                document.getElementById('providerBadge').innerText = data.provider;
+
+                // Render table if records exist
+                const container = document.getElementById('tableContainer');
+                if (data.data && data.data.length > 0) {
+                    let html = '<div class="table-responsive"><table><thead><tr>';
+                    const headers = Object.keys(data.data[0]);
+                    headers.forEach(h => html += `<th>${h}</th>`);
+                    html += '</tr></thead><tbody>';
+
+                    data.data.forEach(row => {
+                        html += '<tr>';
+                        headers.forEach(h => {
+                            let val = row[h];
+                            if (val === null || val === undefined) val = '-';
+                            if (h === 'status') {
+                                val = `<span class="badge badge-${val.toLowerCase()}">${val}</span>`;
+                            } else if (h === 'priority') {
+                                val = `<span class="badge badge-${val.toLowerCase()}">${val}</span>`;
+                            }
+                            html += `<td>${val}</td>`;
+                        });
+                        html += '</tr>';
+                    });
+                    html += '</tbody></table></div>';
+                    container.innerHTML = html;
+                } else {
+                    container.innerHTML = '';
+                }
+            } catch (err) {
+                alert('Error running query: ' + err.message);
+            } finally {
+                btnText.innerText = 'Ask AI';
+            }
+        }
+
+        // Enter key to run
+        document.getElementById('queryInput').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') runQuery();
+        });
+
+        // Load Anomalies
+        async function loadAnomalies() {
+            const category = document.getElementById('anomalyCategoryFilter').value;
+            const severity = document.getElementById('anomalySeverityFilter').value;
+
+            let url = '/anomalies?';
+            if (category) url += `category=${encodeURIComponent(category)}&`;
+            if (severity) url += `min_severity=${encodeURIComponent(severity)}`;
+
+            const res = await fetch(url);
+            const data = await res.json();
+            const list = document.getElementById('anomaliesList');
+
+            if (!data.anomalies || data.anomalies.length === 0) {
+                list.innerHTML = '<div style="text-align: center; padding: 40px; color: var(--text-dim);">No anomalies found for the selected criteria.</div>';
+                return;
+            }
+
+            let html = '';
+            data.anomalies.forEach(a => {
+                const isCrit = a.severity === 'CRITICAL';
+                html += `
+                    <div class="anomaly-card ${isCrit ? 'critical' : 'high'}">
+                        <div class="anomaly-info">
+                            <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 6px;">
+                                <span class="badge ${isCrit ? 'badge-critical' : 'badge-high'}">${a.severity}</span>
+                                <h4>${a.ticket_id} &bull; ${a.category}</h4>
+                                <span style="font-size: 12px; color: var(--text-dim);">Assigned: ${a.agent_id}</span>
+                            </div>
+                            <p style="color: #e5e7eb; font-weight: 500; margin-bottom: 4px;">${a.reason}</p>
+                            <p style="font-size: 12px; color: var(--text-dim);">${a.issue_summary}</p>
+                        </div>
+                        <div class="anomaly-stats">
+                            <div class="anomaly-stat-val">${a.actual_value} hrs</div>
+                            <div class="anomaly-stat-sub">Threshold: ${a.threshold} hrs</div>
+                        </div>
+                    </div>
+                `;
+            });
+            list.innerHTML = html;
+        }
+
+        // Load Tickets Database
+        let currentTicketPage = 1;
+        async function loadTickets(page = 1) {
+            currentTicketPage = page;
+            const status = document.getElementById('ticketStatusFilter').value;
+            const priority = document.getElementById('ticketPriorityFilter').value;
+
+            let url = `/tickets?page=${page}&page_size=15`;
+            if (status) url += `&status=${encodeURIComponent(status)}`;
+            if (priority) url += `&priority=${encodeURIComponent(priority)}`;
+
+            const res = await fetch(url);
+            const data = await res.json();
+            const container = document.getElementById('ticketsTableContainer');
+
+            let html = '<div class="table-responsive"><table><thead><tr>';
+            const headers = ['ticket_id', 'created_at', 'category', 'priority', 'status', 'response_time_hrs', 'resolution_time_hrs', 'agent_id', 'customer_rating', 'issue_summary'];
+            headers.forEach(h => html += `<th>${h.replace(/_/g, ' ')}</th>`);
+            html += '</tr></thead><tbody>';
+
+            data.items.forEach(row => {
+                html += '<tr>';
+                headers.forEach(h => {
+                    let val = row[h];
+                    if (val === null || val === undefined) val = '-';
+                    if (h === 'status') {
+                        val = `<span class="badge badge-${val.toLowerCase()}">${val}</span>`;
+                    } else if (h === 'priority') {
+                        val = `<span class="badge badge-${val.toLowerCase()}">${val}</span>`;
+                    }
+                    html += `<td>${val}</td>`;
+                });
+                html += '</tr>';
+            });
+            html += '</tbody></table></div>';
+            container.innerHTML = html;
+
+            // Pagination controls
+            document.getElementById('paginationContainer').innerHTML = `
+                <span style="font-size: 13px; color: var(--text-dim);">Showing Page ${data.page} of ${data.total_pages} (${data.total_items} total)</span>
+                <div>
+                    <button class="chip" ${data.page <= 1 ? 'disabled style="opacity:0.4;"' : `onclick="loadTickets(${data.page - 1})"`}>&larr; Prev</button>
+                    <button class="chip" ${data.page >= data.total_pages ? 'disabled style="opacity:0.4;"' : `onclick="loadTickets(${data.page + 1})"`}>Next &rarr;</button>
+                </div>
+            `;
+        }
+
+        // Initial load
+        window.addEventListener('DOMContentLoaded', () => {
+            fetch('/metrics').then(r => r.json()).then(m => {
+                document.getElementById('totalTickets').innerText = m.total_tickets;
+                document.getElementById('openTickets').innerText = m.open_tickets;
+                document.getElementById('resolvedTickets').innerText = m.resolved_tickets;
+                document.getElementById('avgCsat').innerHTML = `${m.avg_csat} <span style="font-size: 16px; color: var(--text-dim);">/ 5.0</span>`;
+                document.getElementById('avgResolution').innerHTML = `${m.avg_resolution_hrs} <span style="font-size: 16px; color: var(--text-dim);">hrs</span>`;
+            });
+        });
+    </script>
+</body>
+</html>

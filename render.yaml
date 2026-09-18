@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: support-ticket-ai-system
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python main.py
+    envVars:
+      - key: PORT
+        value: 10000
